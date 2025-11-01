@@ -23,21 +23,62 @@ async def run():
 
 
 async def login():
+    load_users = await node.get("users")
+
+    user_dict = json.loads(load_users)
     
     answer = input("Returning User? Y/N ")
+    
 
     if answer == "Y":
         usrname = input("Enter Username:")
-        psswrd = input("Enter Password:")
-        users = await node.get("users")
-        users = json.loads(users)
 
-        login_info = users.get(usrname)
+        psswrd = input("Enter Password:")
+        
+        login_info = user_dict.get(usrname)
+
         if bcrypt.checkpw(psswrd.encode(), login_info.get("password").encode()):
+
             print("WELCOME")
         
         else:
+
             print("WRONG PASSWORD")
+
+    elif answer == "N":
+        
+        while True:
+
+            setUsername = input("Set Username: ")
+
+            if user_dict.get(setUsername) is not None:
+
+                print("Username is already taken")
+
+            else:
+
+                break
+
+        setPassword = input("Set Password: ")
+
+        salt = bcrypt.gensalt()
+
+        hash_pw = bcrypt.hashpw(setPassword.encode(),salt)
+
+        user_dict[setUsername] = hash_pw.decode()
+
+        await node.set("users",json.dumps(user_dict))
+
+        
+
+
+        
+
+
+
+
+
+    
 
 
 
