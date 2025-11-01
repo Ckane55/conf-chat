@@ -28,22 +28,33 @@ async def login():
     user_dict = json.loads(load_users)
     
     answer = input("Returning User? Y/N ")
-    
-
+    attempts = 0
+   
     if answer == "Y":
+
         usrname = input("Enter Username:")
+        while attempts != 3:
+            psswrd = input("Enter Password:")
+            
+            login_info = user_dict.get(usrname)
 
-        psswrd = input("Enter Password:")
-        
-        login_info = user_dict.get(usrname)
+            if bcrypt.checkpw(psswrd.encode(), login_info.get("password").encode()):
 
-        if bcrypt.checkpw(psswrd.encode(), login_info.get("password").encode()):
+                print("WELCOME")
+                break
+            
+            else:
 
-            print("WELCOME")
-        
-        else:
+                print("Password is incorrect")
+                attempts += 1
+                if attempts != 3:
+                    print("You have " + str(3 - attempts) + " attempts left.")
+                else:
+                    print("You have reached the maximum amount of password attempts.")
+                
 
-            print("WRONG PASSWORD")
+
+
 
     elif answer == "N":
         
@@ -62,9 +73,11 @@ async def login():
         setPassword = input("Set Password: ")
 
         salt = bcrypt.gensalt()
-
+        
+        #.encode() converts string to bytes and the bytes are hashed
         hash_pw = bcrypt.hashpw(setPassword.encode(),salt)
 
+        #.decode converts the bytes back to a string and the hash string is stored in DHT
         user_dict[setUsername] = hash_pw.decode()
 
         await node.set("users",json.dumps(user_dict))
