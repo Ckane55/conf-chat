@@ -5,57 +5,60 @@ import bcrypt
 import json
 node = Server()
 async def run():
-    # Create a node and start listening on port 5678
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(('', 0))
+    port = sock.getsockname()[1]
+    sock.close()
     
-    await node.listen(5679)
-    hostname = socket.gethostname()
-    ip = socket.gethostbyname(hostname)
-
-    # Bootstrap the node by connecting to other known nodes, in this case
-    # replace 123.123.123.123 with the IP of another node and optionally
-    # give as many ip/port combos as you can for other nodes.
-    await node.bootstrap([("10.5.0.2", 5678)])
-    await login()
-
     
-
+    await node.listen(port)
     
 
 
-async def login():
+    await node.bootstrap([("127.0.0.1", 5678)])
+    await login(port)
+    while True:
+        await asyncio.sleep(5)
+
+    
+
+    
+
+
+async def login(port):
     load_users = await node.get("users")
 
     user_dict = json.loads(load_users)
     
     answer = input("Returning User? Y/N ")
-    attempts = 0
+    valid = False
    
     if answer == "Y":
 
         usrname = input("Enter Username:")
-        while attempts != 3:
+        while valid == False:
             psswrd = input("Enter Password:")
             
             login_info = user_dict.get(usrname)
 
             if bcrypt.checkpw(psswrd.encode(), login_info.get("password").encode()):
 
-                print("WELCOME")
+                
+
+                user_dict[usrname]["Port"] = port
+                await node.set("users",json.dumps(user_dict))
                 break
+                
+                
             
             else:
 
                 print("Password is incorrect")
-                attempts += 1
-                if attempts != 3:
-                    print("You have " + str(3 - attempts) + " attempts left.")
-                else:
-                    print("You have reached the maximum amount of password attempts.")
+
+
+
                 
-
-
-
-
     elif answer == "N":
         
         while True:
@@ -78,26 +81,38 @@ async def login():
         hash_pw = bcrypt.hashpw(setPassword.encode(),salt)
 
         #.decode converts the bytes back to a string and the hash string is stored in DHT
-        user_dict[setUsername] = hash_pw.decode()
+        user_dict[setUsername] = {
+            "password": hash_pw.decode(),
+            "port": port,
+            "chats": {}
 
-        await node.set("users",json.dumps(user_dict))
+        }
 
+    await node.set("users",json.dumps(user_dict))
+    await check_chats(usrname)
         
 
 
-        
 
 
 
 
 
-    
+async def check_chats(username):
+    load_users = await node.get("users")
+    user_dict = json.loads(load_users)
+    user_chats = user_dict[username]["chats"]
 
+    chats = []
+    index = 0
+    if user_chats == {}:
+        print("You have no active chats")
+    else:
+        for partner, messages in user_chats.items():
+            print(f"#{index} Chat with {partner}")
+            chats.append(index)
 
-
-
-
-
+            
 
 
 asyncio.run(run())

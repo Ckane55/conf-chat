@@ -9,7 +9,7 @@ async def run():
     hostname = socket.gethostname()
     ip = socket.gethostbyname(hostname)
     print(ip)
-    await node.listen(5678)
+    await node.listen(5679)
 
     await node.bootstrap([
     ("127.0.0.1", 5679),  # self

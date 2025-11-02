@@ -1,8 +1,39 @@
 {
     "users": {
         "Caden": {
-            "password": "$2b$12$eCokODnhz9t6SLAdvd8oquNWI/sGaXV3RVZ1XIsEQ4FbAxjcz0YLK"
+            "password": "$2b$12$eCokODnhz9t6SLAdvd8oquNWI/sGaXV3RVZ1XIsEQ4FbAxjcz0YLK",
+            "port": {},
+            "chats": {}
+            
+
+        },
+        "Jeff": {
+            "password": "$2b$12$eCokODnhz9t6SLAdvd8oquNWI/sGaXV3RVZ1XIsEQ4FbAxjcz0YLK",
+            "port": {},
+            "chats": {}
+            
+
+        },
+        "Chris": {
+            "password": "$2b$12$eCokODnhz9t6SLAdvd8oquNWI/sGaXV3RVZ1XIsEQ4FbAxjcz0YLK",
+            "port": {},
+            "chats": {
+                "Caden": [
+                {"sender": "Caden", "message": "Hello"},
+                {"sender": "Chris", "message": "Hey!"},
+                {"sender": "Caden", "message": "Whats up?"}
+            ]
+                    
+
+                
+            }
+            
+
         }
+
+
+
     }
+
     
 }
