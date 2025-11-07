@@ -12,7 +12,7 @@ async def run():
     ip = socket.gethostbyname(hostname)
 
 
-    await node.bootstrap([("10.5.0.2", 5678)])
+    await node.bootstrap([("127.0.0.1", 5678)])
 
     users = await node.get("users")
     print(users)

@@ -27,12 +27,15 @@ async def run():
 
 
 
+    stop_event = asyncio.Event()
+    await stop_event.wait()
+
         
 
 
 
-    while True:
-       await asyncio.sleep(5)
+
+
 
    
                 

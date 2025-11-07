@@ -11,24 +11,26 @@ async def run():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(('', 0))
-    port = 6001#sock.getsockname()[1]
+    port = 6000#sock.getsockname()[1]
     sock.close()
-    print(f"node 2's port is {port}")
+    print(f"node 1's port is {port}")
     
     await node.listen(port)
-    
-    
 
     await node.bootstrap([("127.0.0.1", 5678)])
     
 
     your_username = await login(port)
-    #await run_server(port)
+
     await choice(your_username, port)
 
     
-  
+
     
+  
+
+
+   
 
 
     
@@ -46,11 +48,11 @@ async def login(your_port):
     
     loop = asyncio.get_running_loop()
     answer = "Y"#await loop.run_in_executor(None, input, "Returning User? Y/N ")
-    valid = False
+   
    
     if answer == "Y":
 
-        usrname = "Chris"#await loop.run_in_executor(None,input,"Enter Username:")
+        usrname = "Caden"#await loop.run_in_executor(None,input,"Enter Username:")
         while True:
             psswrd = "123"#await loop.run_in_executor(None,input,"Enter Password:")
             
@@ -60,31 +62,30 @@ async def login(your_port):
 
                 
                 #Edit JSON to add the port you are currently using
-
                 user_dict[usrname]["port"] = your_port
                 
                 #set the current JSON
                 await node.set("users",json.dumps(user_dict))
-                
 
                 
                 
                 
                 return usrname
-
                 
                 
             
             else:
 
                 print("Password is incorrect")
-
     
 
     
 
     
 
+
+
+    
 
 
     
@@ -181,7 +182,7 @@ async def choice(your_username, your_port):
 
                 for i,users in enumerate(user_dict):
                     print(f"{i}.{users}")
-            peer_username = "Caden"#await loop.run_in_executor(None, input, "Pick a peer: ")
+            peer_username = "Chris"#await loop.run_in_executor(None, input, "Pick a peer: ")
 
             user_dict[your_username]["chats"].setdefault(peer_username, {})
 
@@ -203,6 +204,9 @@ async def choice(your_username, your_port):
                     break
             await start_chat(your_username,your_port, peer_username, peer_port, refresh, node)
 
+
+
+
 async def refresh(peer_username):
     load_users = await node.get("users")
 
@@ -210,5 +214,4 @@ async def refresh(peer_username):
     user_dict = json.loads(load_users)
     port = user_dict[peer_username]["port"]
     return port
-
 asyncio.run(run())
