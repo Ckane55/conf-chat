@@ -22,7 +22,8 @@ async def handle_client(reader, writer):
 
 async def run_server(your_port):
     server = await asyncio.start_server(handle_client, "127.0.0.1", your_port)
-    print(f"[LISTENING on {your_port}]") 
+    #print(f"[LISTENING on {your_port}]") 
+    print("Waiting for peer....")
     
     return server
 

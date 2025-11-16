@@ -5,17 +5,20 @@
             "port": null,
             "chats": {
                 "Chris": {}
-            }
+            },
+            "status": "offline"
         },
         "Jeff": {
             "password": "$2b$12$eCokODnhz9t6SLAdvd8oquNWI/sGaXV3RVZ1XIsEQ4FbAxjcz0YLK",
             "port": null,
-            "chats": {}
+            "chats": {},
+            "status": "offline"
         },
         "Chris": {
             "password": "$2b$12$eCokODnhz9t6SLAdvd8oquNWI/sGaXV3RVZ1XIsEQ4FbAxjcz0YLK",
             "port": null,
-            "chats": {}
+            "chats": {},
+            "status": "offline"
         }
     }
 }
