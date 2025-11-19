@@ -23,7 +23,7 @@ async def handle_client(reader, writer):
 async def run_server(your_port):
     server = await asyncio.start_server(handle_client, "127.0.0.1", your_port)
     #print(f"[LISTENING on {your_port}]") 
-    print("Waiting for peer....")
+   # print("Waiting for peer....")
     
     return server
 
@@ -42,7 +42,7 @@ async def run_client(your_username, peer_username, peer_port, refresh):
                 reader, writer = await asyncio.open_connection("127.0.0.1", peer_port)
                 
                 print(f"Successfully connected to {peer_username}")
-                writer.write((your_username + " has connected!\n").encode())
+                #writer.write((your_username + " has connected!\n").encode())
                 await writer.drain()
                 
                 #asyncio.create_task(read_server(reader))
@@ -59,7 +59,7 @@ async def run_client(your_username, peer_username, peer_port, refresh):
                 chats.append(f"{your_username}: {msg}")
                 await writer.drain()
         except ConnectionRefusedError:
-            print(f"[WAITING FOR PEER] on {peer_port}")
+            #print(f"[WAITING FOR PEER] on {peer_port}")
             peer_port = await refresh(peer_username)
             await asyncio.sleep(2)
 

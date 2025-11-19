@@ -5,8 +5,7 @@ import bcrypt
 import json
 import os
 import sys
-from chat_tcp import run_server, start_chat, run_client
-
+from chat_tcp import start_chat
 from Chat_store import offline_store
 node = Server()
 IP = "127.0.0.1"
@@ -31,14 +30,7 @@ async def run():
 
     
   
-
-
-   
-
-
-    
-
-    
+ 
 
 
 async def login(your_port):
@@ -79,7 +71,7 @@ async def login(your_port):
 
                 
                 
-                
+                await asyncio.sleep(1)
                 return usrname
                 
                 
@@ -120,6 +112,9 @@ async def login(your_port):
 
 
         }
+        await node.set("users",json.dumps(user_dict))
+        await asyncio.sleep(1)
+        return setUsername
 
 
     
@@ -127,7 +122,7 @@ async def login(your_port):
     
         
     
-    await node.set("users",json.dumps(user_dict))
+   
     #print(user_dict)
    # await check_chats(usrname)
         
@@ -136,9 +131,11 @@ async def login(your_port):
 
 
 async def choice(your_username, your_port):
+        await asyncio.sleep(1)
         os.system('cls')
         while True:
             print("What next?\n1. Chat with a peer.")
+            
 
             loop = asyncio.get_running_loop()
             answer = await loop.run_in_executor(None, input, "Pick a number: ")
@@ -149,10 +146,13 @@ async def choice(your_username, your_port):
                     os.system('cls')
 
                     #Grab users from DHT
+                    node.storage.data.pop("users", None)
                     load_users = await node.get("users")
+                    
 
                     #Convert DHT data to JSON
                     user_dict = json.loads(load_users)
+                   
 
                     print("Peers available to chat:\n")
 
@@ -232,7 +232,9 @@ async def choice(your_username, your_port):
 
 
 async def refresh(peer_username):
+    
     load_users = await node.get("users")
+
 
     #Convert DHT data to JSON
     user_dict = json.loads(load_users)
@@ -251,7 +253,4 @@ async def quit_app(user_dict, your_username):
 
 
 asyncio.run(run())
-
-
-
 

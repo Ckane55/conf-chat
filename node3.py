@@ -5,7 +5,8 @@ import bcrypt
 import json
 import os
 import sys
-from chat_tcp import run_server, start_chat, run_client
+from chat_tcp import start_chat
+from Chat_store import offline_store
 node = Server()
 IP = "127.0.0.1"
 async def run():
@@ -29,14 +30,7 @@ async def run():
 
     
   
-
-
-   
-
-
-    
-
-    
+ 
 
 
 async def login(your_port):
@@ -52,9 +46,12 @@ async def login(your_port):
    
    
     if answer == "Y":
+        os.system('cls')
 
         usrname = await loop.run_in_executor(None,input,"Enter Username:")
+        os.system('cls')
         while True:
+            
             psswrd = await loop.run_in_executor(None,input,"Enter Password:")
             
             login_info = user_dict.get(usrname)
@@ -67,33 +64,38 @@ async def login(your_port):
                 user_dict[usrname]["status"] = "online"
                 
                 #set the current JSON
+                #print(user_dict)
                 await node.set("users",json.dumps(user_dict))
+                print("set to online")
+
 
                 
                 
-                
+                await asyncio.sleep(1)
                 return usrname
                 
                 
             
             else:
-
+                os.system('cls')
                 print("Password is incorrect")
     
     elif answer == "N":
-        
+        os.system('cls')
         while True:
-
+            os.system('cls')
             setUsername = input("Set Username: ")
+            
 
             if user_dict.get(setUsername) is not None:
-
+                os.system('cls')
                 print("Username is already taken")
 
             else:
 
-                
+                os.system('cls')
                 setPassword = input("Set Password: ")
+                
                 break
 
         salt = bcrypt.gensalt()
@@ -105,9 +107,14 @@ async def login(your_port):
         user_dict[setUsername] = {
             "password": hash_pw.decode(),
             "port": your_port,
-            "chats": {}
+            "chats": {},
+            "status": "online"
+
 
         }
+        await node.set("users",json.dumps(user_dict))
+        await asyncio.sleep(1)
+        return setUsername
 
 
     
@@ -115,48 +122,20 @@ async def login(your_port):
     
         
     
-    await node.set("users",json.dumps(user_dict))
+   
+    #print(user_dict)
    # await check_chats(usrname)
         
 
 
-"""
-async def check_chats(username):
-    os.system('cls')
-    load_users = await node.get("users")
-    user_dict = json.loads(load_users)
-    user_chats = user_dict[username]["chats"]
 
-    chats = []
-    index = 0
-    if user_chats == {}:
-        print("You have no active chats")
-    else:
-        for partner, messages in user_chats.items():
-            print(f"#{index} Chat with {partner}")
-            chats.append(partner)
-    
-    choice = input("Choose a chat: ")
-
-    print("To quit type :wq")
-
-
-    
-    user_chat = user_chats[choice]
-    port = int(user_dict[choice]["port"])
-    
-
-
-   # os.system('cls')
-    #for msg in user_chat:
-       # print(print(f"{msg['sender']}: {msg['message']}"))
-
-    
-    """
 
 async def choice(your_username, your_port):
+        await asyncio.sleep(1)
+        os.system('cls')
         while True:
             print("What next?\n1. Chat with a peer.")
+            
 
             loop = asyncio.get_running_loop()
             answer = await loop.run_in_executor(None, input, "Pick a number: ")
@@ -164,12 +143,16 @@ async def choice(your_username, your_port):
 
             if answer == "1":
                 while True:
+                    os.system('cls')
 
                     #Grab users from DHT
+                    node.storage.data.pop("users", None)
                     load_users = await node.get("users")
+                    
 
                     #Convert DHT data to JSON
                     user_dict = json.loads(load_users)
+                   
 
                     print("Peers available to chat:\n")
 
@@ -177,10 +160,10 @@ async def choice(your_username, your_port):
                         if username == your_username:
                             continue
                         elif info.get("status") == "offline":
-                            continue
+                            print(f"{username} - Offline")
                         else:
 
-                            print(f"{username}")
+                            print(f"{username} - Online")
                     peer_username = await loop.run_in_executor(None, input, "Pick a peer: ")
                     if peer_username == "r":
                         os.system('cls')
@@ -192,40 +175,66 @@ async def choice(your_username, your_port):
                         break
 
 
-                
-            
+                    
+                if user_dict[peer_username]["status"] == "offline":
+                    user_dict[your_username]["chats"].setdefault(peer_username, {})
+                    os.system('cls')
+
+                    print("User is Offline...")
+                    for x in user_dict[your_username]["chats"][peer_username]:
+                        print(x)
+                    offline_chats = []
+
+                    while True:
+                        msg = input()
+
+                        if msg == "q":
+                            if offline_chats == []:
+                                break
+                            else:
+                                await offline_store(node, offline_chats, your_username, peer_username)
+                                break
+                        else:
+                            offline_chats.append(msg)
+
+                        
+                        
+
+
 
             
 
-                user_dict[your_username]["chats"].setdefault(peer_username, {})
+            
 
-                await node.set("users",json.dumps(user_dict))
-
-            elif answer == "q":
-                #await remove peer
-                sys.exit
-
-
-            while True:
-                if user_dict[peer_username]["port"] == None:
-                    print("Cannot find user port")
-                    load_users = await node.get("users")
-
-                    #Convert DHT data to JSON
-                    user_dict = json.loads(load_users)
-                    await asyncio.sleep(2)
-                    continue
                 else:
+                    user_dict[your_username]["chats"].setdefault(peer_username, {})
 
-                    peer_port = int(user_dict[peer_username]["port"])
-                    break
-            await start_chat(your_username,your_port, peer_username, peer_port, refresh, node)
+                    await node.set("users",json.dumps(user_dict))
+
+
+                    while True:
+                        if user_dict[peer_username]["port"] == None:
+                            print("Cannot find user port")
+                            load_users = await node.get("users")
+
+                            #Convert DHT data to JSON
+                            user_dict = json.loads(load_users)
+                            await asyncio.sleep(2)
+                            continue
+                        else:
+
+                            peer_port = int(user_dict[peer_username]["port"])
+                            break
+                    os.system('cls')
+                    await start_chat(your_username,your_port, peer_username, peer_port, refresh, node)
 
 
 
 
 async def refresh(peer_username):
+    
     load_users = await node.get("users")
+
 
     #Convert DHT data to JSON
     user_dict = json.loads(load_users)
@@ -239,6 +248,9 @@ async def quit_app(user_dict, your_username):
     await node.set("users", json.dumps(user_dict))
 
     sys.exit()
+
+
+
+
 asyncio.run(run())
 
-#async def remove
