@@ -2,7 +2,7 @@
 A P2P Chat application made in Python using Kademlia for the DHT and Asyncio for the live TCP chat.
 
 
-#How it works.
+# How it works.
 
 Conf-chat works by storing user data in a distributed hash table that is stored among peer nodes. In a given nodes DHT will be the username and passwords of other users which is stored as a hash using bcrypt. The port that the peer is using will be stored in the DHT upon the user logging in and the current chats that the user has among different peers will also be stored in the table. Each user also has a status associated with them in the table that tells other peers if they are online or offline. If a peer is offline and another user tries to message them, the messages sent will be written to the DHT directly. If the user is online, then a TCP connection will be establishes that allows for live text chat between the two. Upon terminating the TCP connection, the chats are stored in the DHT so that they can be viewed at any time.
 
@@ -10,7 +10,7 @@ Below is a JSON of the DHT structure
 <img width="836" height="605" alt="image" src="https://github.com/user-attachments/assets/89cfa6d4-6813-4e3e-9abd-58561a7e1161" />
 
 
-#How to run it
+# How to run it
 
 1. You will need to start supernode.py, this is a bootstrap node that initializes the network that subsequent nodes will connect to the network with
    <img width="540" height="222" alt="image" src="https://github.com/user-attachments/assets/5a1eac53-67c9-4116-a7e7-894f6df5b85d" />
@@ -30,7 +30,7 @@ Below is a JSON of the DHT structure
  <img width="1137" height="566" alt="image" src="https://github.com/user-attachments/assets/da80395f-253f-4691-93ff-8ff1bbdebd22" />
 
 
-#Offline chats
+# Offline chats
 
 If you want to send a message to someone who is offline, you can do so by selecting a peer that is offline, it will give you a text prompt that the user is not online and you can send them offline messages which will be written directly to the DHT. To quit just type "q"
 
